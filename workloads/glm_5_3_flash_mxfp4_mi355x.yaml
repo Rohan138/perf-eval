@@ -1,0 +1,55 @@
+# amd/GLM-5.3-Flash-Quark-MXFP4 on AMD MI355X, with the GLM-5.3-Flash recipe AMD overrides
+# Quark OCP MXFP4 weights and activations for the routed experts; MLA attention, the
+# dense MLPs, and the MTP layer stay block FP8 and linear attention stays BF16.
+# gfx950 only.
+name: glm_5_3_flash_mxfp4-mi355x
+gpu: MI355X
+num_gpus: 8
+nightly: true
+
+vllm:
+  model: amd/GLM-5.3-Flash-Quark-MXFP4
+  env:
+    VLLM_ROCM_USE_AITER: 1
+    VLLM_ENGINE_READY_TIMEOUT_S: 3600
+  serve_args: >-
+    --tensor-parallel-size 8
+    --max-num-seqs 512
+    --attention-backend ROCM_AITER_MLA_SPARSE
+    --trust-remote-code
+
+lm_eval:
+  model_args:
+    tokenized_requests: false
+    tokenizer_backend: null
+    timeout: 6000
+  tasks:
+    - name: gsm8k
+      num_fewshot: 5
+      model_args:
+        num_concurrent: 64
+        max_length: 40960
+        max_gen_toks: 32768
+
+vllm_bench:
+  metadata:
+    precision: mxfp4
+  configs:
+    - name: 8k-in-1k-out
+      backend: openai
+      dataset: random
+      input_len: 8192
+      output_len: 1024
+      num_prompts: 512
+      max_concurrency: 128
+      speed_bench_dataset_subset: throughput_8k
+      speed_bench_category: low_entropy
+    - name: 1k-in-1k-out
+      backend: openai
+      dataset: random
+      input_len: 1024
+      output_len: 1024
+      num_prompts: [10, 256, 512]
+      max_concurrency: [1, 64, 128]
+      speed_bench_dataset_subset: throughput_8k
+      speed_bench_category: low_entropy
