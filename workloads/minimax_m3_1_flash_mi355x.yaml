@@ -1,9 +1,4 @@
-# MiniMax-M3.1-Flash (bf16) on AMD MI355X
-# Upstream MiniMaxAI/MiniMax-M3.1-Flash. Same lineage as minimax_m3 (model_type
-# minimax_m3_vl), so it reuses that serve path: AITER MoE + shared-expert fusion,
-# TRITON attention, fp8 KV, the minimax_m3 tool/reasoning parsers. Served text-only
-# for these sweeps; the vision tower is not exercised. gfx950 only.
-# AMD Quark MXFP4 variant (amd/MiniMax-M3.1-Flash-Quark-MXFP4) to follow.
+# MiniMax-M3.1-Flash (upstream bf16) on MI355X
 name: minimax_m3_1_flash-mi355x
 gpu: MI355X
 num_gpus: 8
