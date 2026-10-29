@@ -1,7 +1,4 @@
-# amd/GLM-5.3-Flash-Quark-MXFP4 on AMD MI355X
-# Quark OCP MXFP4 weights and activations for the routed experts; MLA attention, the
-# dense MLPs, and the MTP layer stay block FP8 and linear attention stays BF16.
-# gfx950 only.
+# amd/GLM-5.3-Flash-Quark-MXFP4 on MI355X; serve path per the GLM-5.3-Flash recipe (AMD).
 name: glm_5_3_flash_mxfp4-mi355x
 gpu: MI355X
 num_gpus: 8
@@ -11,10 +8,15 @@ vllm:
   model: amd/GLM-5.3-Flash-Quark-MXFP4
   env:
     VLLM_ROCM_USE_AITER: 1
+    VLLM_ROCM_USE_AITER_FUSION_SHARED_EXPERTS: 1
+    VLLM_ROCM_USE_AITER_TRITON_SPARSE_MLA: 1
   serve_args: >-
-    --tensor-parallel-size 8
+    --tensor-parallel-size 4
     --max-num-seqs 512
-    --reasoning-parser glm45
+    --attention-backend ROCM_AITER_MLA_SPARSE
+    --tool-call-parser glm47
+    --enable-auto-tool-choice
+    --reasoning-parser glm47
 
 lm_eval:
   model_args:
